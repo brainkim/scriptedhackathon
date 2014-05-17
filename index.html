@@ -103,20 +103,17 @@ Maze.prototype = {
 
 function renderGrid(maze, gridElement) {
     gridElement.empty();
-    console.log(maze);
     var player = $("<div></div>");
     player.addClass("circle");
     var grid = maze.grid;
     var playerX = maze.player[0];
     var playerY = maze.player[1];
     for (var i = 0; i < grid.length; i++) {
-        console.log("hello?");
         var row = grid[i];
         // create a div
         var rowElement = $("<div></div>");
         // append div to $node
         for (var j = 0; j < row.length; j++) {
-            console.log("hello!?!?!?");
             // create an inner divid
             var cell = row[j];
             var cellElement = $("<div></div>");
@@ -148,7 +145,6 @@ function render() {
 }
 
 $(window).keypress( function(event) {
-  console.log(event.which);
   var key = event.which;
   if (key===119) {
       console.log("up");
@@ -164,6 +160,7 @@ $(window).keypress( function(event) {
       render();
   }
 });
+render();
   </script>
   </body>
 </html>
