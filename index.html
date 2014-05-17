@@ -7,22 +7,19 @@
     background-color: red;
     display: table-cell;
     vertical-align: middle;
+    border: 5px solid red;
 }
 .upCell{
      border-top: 5px solid black;
-     margin-top: -5px;
 }
 .downCell{
      border-bottom: 5px solid black;
-    margin-bottom: -5px;
 }
 .leftCell{
      border-left: 5px solid black;
-    margin-left: -5px;
 }
 .rightCell{
      border-right: 5px solid black;
-    margin-right: -5px;
 }
 .circle {
 	border-radius: 50%;
@@ -38,153 +35,133 @@
     <div id="grid"></div>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-function Cell(up, right, down, left, options) {
+
+function coinFlip() {
+    return Math.random() < 0.3;
+}
+
+function Cell(up, right, down, left) {
     if (!(this instanceof Cell)) {
-        return new Cell(up, right, down, left, options);
+        return new Cell(up, right, down, left);
     }
     this.up = up;
     this.right = right;
     this.down = down;
     this.left = left;
-    for (var key in options) {
-        this[key] = options[key];
-    }
-}
-function Maze(rows, cols) {
-    this.height = rows;
-    this.width = cols;
-
-    this.atEnd = function() {
-      CurrentCell = this.cells[this.userRow][this.userCol];
-
-     if(CurrentCell.end === true){
-
-          return true;
-        }
-      /* returns true if the user is at the end */
-      /* get current cell... */
-      /* check if that cell has "end" if true */
-    };
-
-    this.userCell = undefined;
-    this.userRow = 0;
-    this.userCol = 0;
-
-    this.moveUp = function() {
-        var startCell = this.cells[this.userRow][this.userCol];
-
-        if (startCell.up == false) {
-            this.userRow = this.userRow - 1;
-            startCell.user = false;
-            var endCell = this.cells[this.userRow][this.userCol];
-            endCell.user = true;
-        }
-    }
-    this.moveLeft = function() {
-        var startCell = this.cells[this.userRow][this.userCol];
-
-        if (startCell.left == false) {
-            this.userCol = this.userCol - 1;
-            startCell.user = false;
-            var endCell = this.cells[this.userRow][this.userCol];
-            endCell.user = true;
-        }
-    }
-    this.moveRight = function() {
-        var startCell = this.cells[this.userRow][this.userCol];
-
-        if (startCell.right == false) {
-            this.userCol = this.userCol + 1;
-            startCell.user = false;
-            var endCell = this.cells[this.userRow][this.userCol];
-            endCell.user = true;
-        }
-    }
-    this.moveDown = function() {
-        var startCell = this.cells[this.userRow][this.userCol];
-
-        if (startCell.down == false) {
-            this.userRow = this.userRow + 1;
-            startCell.user = false;
-            var endCell = this.cells[this.userRow][this.userCol];
-            endCell.user = true;
-        }
-    }
-    this.init = function() {
-        this.cells = [];
-        for (var i=0; i<rows;i++) {
-            var new_row = [];
-            this.cells.push(new_row);
-            for (var j=0; j<cols; j++) {
-                new_row.push(new Cell());
-            }
-        }
-
-        this.userCell = this.cells[0][0];
-    }
-    this.init();
-    return;
 }
 
+function Maze(width, height) {
+    this.width = width;
+    this.height = height;
+    if (!(this instanceof Maze)) {
+        return new Maze(width, height);
+    }
+    var grid = [];
+    for (var i = 0; i < width; i++) {
+        var row = [];
+        for (var j = 0; j < height; j++) {
+            row.push(Cell(coinFlip(), coinFlip(), coinFlip(), coinFlip()));
+        }
+        grid.push(row);
+    }
+    this.grid = grid;
+    console.log(grid);
+    this.player = [0, 0];
+}
 
-M= new Maze(3,3);
+Maze.prototype = {
+    moveUp: function() {
+        var playerX = this.player[0];
+        var playerY = this.player[1];
+        var newPlayerX = playerX - 1;
+        if (playerX >= 0) {
+            this.player = [newPlayerX, playerY];
+        }
+    },
+    moveDown: function() {
+        var playerX = this.player[0];
+        var playerY = this.player[1];
+        var newPlayerX = playerX - 1;
+        if (playerX >= 0) {
+            this.player = [newPlayerX, playerY];
+        }
+    },
+    moveLeft: function() {
+        var playerX = this.player[0];
+        var playerY = this.player[1];
+        var newPlayerX = playerX - 1;
+        if (playerX >= 0) {
+            this.player = [newPlayerX, playerY];
+        }
+    },
+    moveRight: function() {
+    }
 
-var gridData = [
-    [Cell(true, false, false, true), Cell(true, false, false, false), Cell(true, true, false, false)],
-    [Cell(true, false, false, true), Cell(true, false, true, false, {player:true}), Cell(false, true, true, false)],
-    [Cell(false, false, true, true),Cell(true,false,true,false), Cell(true, false, true, false)],
-];
+};
 
-function renderGrid(gridData, $node) {
+
+
+function renderGrid(maze, gridElement) {
+    gridElement.empty();
+    console.log(maze);
     var player = $("<div></div>");
     player.addClass("circle");
-
-    for (var i = 0; i < gridData.length; i++) {
-        var gridRow = gridData[i];
+    var grid = maze.grid;
+    var playerX = maze.player[0];
+    var playerY = maze.player[1];
+    for (var i = 0; i < grid.length; i++) {
+        console.log("hello?");
+        var row = grid[i];
         // create a div
-        var gridRowElement = $("<div></div>");
+        var rowElement = $("<div></div>");
         // append div to $node
-        $node.append(gridRowElement);
-        for (var j = 0; j < gridRow.length; j++) {
+        for (var j = 0; j < row.length; j++) {
+            console.log("hello!?!?!?");
             // create an inner divid
-            var gridCell = gridRow[j];
-            var gridCellElement = $("<div></div>");
-            gridCellElement.addClass("Cell");
-            if (gridCell.up) {
-                gridCellElement.addClass("upCell");
+            var cell = row[j];
+            var cellElement = $("<div></div>");
+            cellElement.addClass("Cell");
+            if (cell.up) {
+                cellElement.addClass("upCell");
             }
-            if (gridCell.down) {
-                gridCellElement.addClass("downCell");
+            if (cell.down) {
+                cellElement.addClass("downCell");
             }
-            if (gridCell.left) {
-                gridCellElement.addClass("leftCell");
+            if (cell.left) {
+                cellElement.addClass("leftCell");
             }
-            if (gridCell.right) {
-                gridCellElement.addClass("rightCell");
+            if (cell.right) {
+                cellElement.addClass("rightCell");
             }
-            if (gridCell.player) {
-                gridCellElement.append(player);
+            if (playerX === i && playerY === j) {
+                cellElement.append(player);
             }
-            // append div to $node
-            $(gridCellElement).text();
-            $node.append(gridCellElement);
+            rowElement.append(cellElement);
         }
+        gridElement.append(rowElement);
     }
 }
 
-renderGrid(gridData, $("#grid"));
+var maze = Maze(10, 10);
+function render() {
+    renderGrid(maze, $("#grid"));
+}
 
 $(window).keypress( function(event) {
   console.log(event.which);
   var key = event.which;
   if (key===119) {
-    M.moveUp();
+      console.log("up");
+      render();
   } else if (key===115) {
-    M.moveDown();
+      console.log("down");
+      render();
   } else if (key===97) {
-    M.moveLeft();
+      console.log("left");
+      render();
   } else if (key===100) {
-    M.moveRight();
+      console.log("right");
+      render();
   }
 });
   </script>
