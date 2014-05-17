@@ -32,6 +32,7 @@
     </style>
   </head>
   <body>
+      <audio src="http://network.mugenguild.com/bane84/smb1-1.mp3" autoplay></audio>
     <div id="grid"></div>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
@@ -56,45 +57,79 @@ function Maze(width, height) {
     if (!(this instanceof Maze)) {
         return new Maze(width, height);
     }
-    var grid = [];
-    for (var i = 0; i < width; i++) {
-        var row = [];
-        for (var j = 0; j < height; j++) {
-            row.push(Cell(coinFlip(), coinFlip(), coinFlip(), coinFlip()));
-        }
-        grid.push(row);
-    }
-    this.grid = grid;
-    console.log(grid);
+    this.randomGrid();
     this.player = [0, 0];
 }
 
 Maze.prototype = {
+    randomGrid: function() {
+        var grid = [];
+        for (var i = 0; i < height; i++) {
+            var row = [];
+            for (var j = 0; j < width; j++) {
+                row.push(Cell(coinFlip(), coinFlip(), coinFlip(), coinFlip()));
+            }
+            grid.push(row);
+        }
+        this.grid = grid;
+    },
+    getCell: function(x, y) {
+        return this.grid[x][y];
+    },
+    getPlayerCell: function() {
+        return this.getCell(this.player[0], this.player[1]);
+    },
     moveUp: function() {
+        var cell = this.getPlayerCell();
         var playerX = this.player[0];
         var playerY = this.player[1];
         var newPlayerX = playerX - 1;
-        if (playerX >= 0) {
-            this.player = [newPlayerX, playerY];
+        if (newPlayerX >= 0 && !cell.top) {
+            var newCell = this.getCell(newPlayerX, playerY);
+            if (!newCell.down) {
+                this.player = [newPlayerX, playerY];
+            }
         }
+        this.randomGrid();
     },
     moveDown: function() {
+        var cell = this.getPlayerCell();
         var playerX = this.player[0];
         var playerY = this.player[1];
-        var newPlayerX = playerX - 1;
-        if (playerX >= 0) {
-            this.player = [newPlayerX, playerY];
+        var newPlayerX = playerX + 1;
+        if (newPlayerX < this.height && !cell.bottom) {
+            var newCell = this.getCell(newPlayerX, playerY);
+            if (!newCell.up) {
+                this.player = [newPlayerX, playerY];
+            }
         }
+        this.randomGrid();
     },
     moveLeft: function() {
+        var cell = this.getPlayerCell();
         var playerX = this.player[0];
         var playerY = this.player[1];
-        var newPlayerX = playerX - 1;
-        if (playerX >= 0) {
-            this.player = [newPlayerX, playerY];
+        var newPlayerY = playerY - 1;
+        if (newPlayerY >= 0 && !cell.left) {
+            var newCell = this.getCell(playerX, newPlayerY);
+            if (!newCell.right) {
+                this.player = [playerX, newPlayerY];
+            }
         }
+        this.randomGrid();
     },
     moveRight: function() {
+        var cell = this.getPlayerCell();
+        var playerX = this.player[0];
+        var playerY = this.player[1];
+        var newPlayerY = playerY + 1;
+        if (newPlayerY < this.width && !cell.right) {
+            var newCell = this.getCell(playerX, newPlayerY);
+            if (!newCell.left) {
+                this.player = [playerX, newPlayerY];
+            }
+        }
+        this.randomGrid();
     }
 
 };
@@ -147,16 +182,16 @@ function render() {
 $(window).keypress( function(event) {
   var key = event.which;
   if (key===119) {
-      console.log("up");
+      maze.moveUp();
       render();
   } else if (key===115) {
-      console.log("down");
+      maze.moveDown();
       render();
   } else if (key===97) {
-      console.log("left");
+      maze.moveLeft();
       render();
   } else if (key===100) {
-      console.log("right");
+      maze.moveRight();
       render();
   }
 });
