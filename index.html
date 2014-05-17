@@ -1,0 +1,192 @@
+<html>
+  <head>
+    <style>
+.Cell{
+    width: 40px;
+    height: 40px;
+    background-color: red;
+    display: table-cell;
+    vertical-align: middle;
+}
+.upCell{
+     border-top: 5px solid black;
+     margin-top: -5px;
+}
+.downCell{
+     border-bottom: 5px solid black;
+    margin-bottom: -5px;
+}
+.leftCell{
+     border-left: 5px solid black;
+    margin-left: -5px;
+}
+.rightCell{
+     border-right: 5px solid black;
+    margin-right: -5px;
+}
+.circle {
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+    background-color: white;
+    margin: 0 auto;
+}
+
+    </style>
+  </head>
+  <body>
+    <div id="grid"></div>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+function Cell(up, right, down, left, options) {
+    if (!(this instanceof Cell)) {
+        return new Cell(up, right, down, left, options);
+    }
+    this.up = up;
+    this.right = right;
+    this.down = down;
+    this.left = left;
+    for (var key in options) {
+        this[key] = options[key];
+    }
+}
+function Maze(rows, cols) {
+    this.height = rows;
+    this.width = cols;
+
+    this.atEnd = function() {
+      CurrentCell = this.cells[this.userRow][this.userCol];
+
+     if(CurrentCell.end === true){
+
+          return true;
+        }
+      /* returns true if the user is at the end */
+      /* get current cell... */
+      /* check if that cell has "end" if true */
+    };
+
+    this.userCell = undefined;
+    this.userRow = 0;
+    this.userCol = 0;
+
+    this.moveUp = function() {
+        var startCell = this.cells[this.userRow][this.userCol];
+
+        if (startCell.up == false) {
+            this.userRow = this.userRow - 1;
+            startCell.user = false;
+            var endCell = this.cells[this.userRow][this.userCol];
+            endCell.user = true;
+        }
+    }
+    this.moveLeft = function() {
+        var startCell = this.cells[this.userRow][this.userCol];
+
+        if (startCell.left == false) {
+            this.userCol = this.userCol - 1;
+            startCell.user = false;
+            var endCell = this.cells[this.userRow][this.userCol];
+            endCell.user = true;
+        }
+    }
+    this.moveRight = function() {
+        var startCell = this.cells[this.userRow][this.userCol];
+
+        if (startCell.right == false) {
+            this.userCol = this.userCol + 1;
+            startCell.user = false;
+            var endCell = this.cells[this.userRow][this.userCol];
+            endCell.user = true;
+        }
+    }
+    this.moveDown = function() {
+        var startCell = this.cells[this.userRow][this.userCol];
+
+        if (startCell.down == false) {
+            this.userRow = this.userRow + 1;
+            startCell.user = false;
+            var endCell = this.cells[this.userRow][this.userCol];
+            endCell.user = true;
+        }
+    }
+    this.init = function() {
+        this.cells = [];
+        for (var i=0; i<rows;i++) {
+            var new_row = [];
+            this.cells.push(new_row);
+            for (var j=0; j<cols; j++) {
+                new_row.push(new Cell());
+            }
+        }
+
+        this.userCell = this.cells[0][0];
+    }
+    this.init();
+    return;
+}
+
+
+M= new Maze(3,3);
+
+var gridData = [
+    [Cell(true, false, false, true), Cell(true, false, false, false), Cell(true, true, false, false)],
+    [Cell(true, false, false, true), Cell(true, false, true, false, {player:true}), Cell(false, true, true, false)],
+    [Cell(false, false, true, true),Cell(true,false,true,false), Cell(true, false, true, false)],
+];
+
+function renderGrid(gridData, $node) {
+    var player = $("<div></div>");
+    player.addClass("circle");
+
+    for (var i = 0; i < gridData.length; i++) {
+        var gridRow = gridData[i];
+        // create a div
+        var gridRowElement = $("<div></div>");
+        // append div to $node
+        $node.append(gridRowElement);
+        for (var j = 0; j < gridRow.length; j++) {
+            // create an inner divid
+            var gridCell = gridRow[j];
+            var gridCellElement = $("<div></div>");
+            gridCellElement.addClass("Cell");
+            if (gridCell.up) {
+                gridCellElement.addClass("upCell");
+            }
+            if (gridCell.down) {
+                gridCellElement.addClass("downCell");
+            }
+            if (gridCell.left) {
+                gridCellElement.addClass("leftCell");
+            }
+            if (gridCell.right) {
+                gridCellElement.addClass("rightCell");
+            }
+            if (gridCell.player) {
+                gridCellElement.append(player);
+            }
+            // append div to $node
+            $(gridCellElement).text();
+            $node.append(gridCellElement);
+        }
+    }
+}
+
+renderGrid(gridData, $("#grid"));
+
+$(window).keypress( function(event) {
+  console.log(event.which);
+  var key = event.which;
+  if (key===119) {
+    M.moveUp();
+  } else if (key===115) {
+    M.moveDown();
+  } else if (key===97) {
+    M.moveLeft();
+  } else if (key===100) {
+    M.moveRight();
+  }
+});
+  </script>
+  </body>
+</html>
